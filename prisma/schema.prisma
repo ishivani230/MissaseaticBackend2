@@ -1,0 +1,151 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                       String            @id @default(uuid())
+  email                    String            @unique
+  password                 String
+  token                    String?           @default("")
+  contactNumber            String            @unique
+  firstName                String
+  middleName               String?
+  lastName                 String
+  dateOfBirth              DateTime?
+  age                      Int?
+  addressType              AddressType       @default(RESIDENTIAL)
+  line1                    String?
+  line2                    String?
+  locality                 String?
+  city                     String?
+  state                    String?
+  country                  String?
+  zone                     String?
+  postCode                 String?
+  emergencyContactName     String?
+  emergencyContactNumber   String?
+  educationalQualification String?
+  hobbiesTalents           String?
+  height                   Float?     
+  weight                   Float?
+  instagramProfile         String?
+  bust                     Int?
+  waist                    Int?
+  hip                      Int?
+  describeYourself         String?
+  personalWebsite          String?
+  title1                   String?
+  title2                   String?
+  proofOfIdentity          String?
+  indianPassport           String?
+  oci                      String?
+  remark1                  String?
+  remark2                  String?
+  remark3                  String?
+  remark4                  String?
+  remark5                  String?
+  isActive                 Boolean           @default(true)
+  isVerified               Boolean?          @default(false)
+  processingStatus         ProcessingStatus? @default(PENDING)
+  role                     Role?             @default(USER)
+  createdAt                DateTime?         @default(now())
+  updatedAt                DateTime?         @updatedAt
+  judgeId                  String?
+  uploads                  Upload[]
+  // address                  Address[]
+  judge                    Judge?            @relation(fields: [judgeId], references: [id])
+  userJudgeMapping         UserJudgeMapping?
+}
+
+model Address {
+  id        String    @id @default(uuid())
+  line1     String?   @db.VarChar(255)
+  line2     String?   @db.VarChar(255)
+  locality  String?   @db.VarChar(45)
+  city      String?   @db.VarChar(45)
+  state     String?   @db.VarChar(45)
+  country   String?   @db.VarChar(45)
+  zone      String?
+  postCode  String?   @db.VarChar(45)
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+  // user      User      @relation(fields: [usersId], references: [id])
+  usersId   String
+}
+
+model Upload {
+  id        String      @id @default(uuid())
+  fileName  String
+  fileUrl   String
+  fileType  UploadType?
+  imageType ImageType?
+  isActive  Boolean     @default(true)
+  createdAt DateTime?   @default(now())
+  updatedAt DateTime?   @updatedAt
+  user      User?       @relation(fields: [userId], references: [id])
+  userId    String?
+}
+
+model Judge {
+  id                String             @id @default(uuid())
+  firstName         String
+  middleName        String?
+  lastName          String
+  email             String             @unique
+  password          String
+  contactNumber     String             @unique
+  auditionLevel     Int                @default(1)
+  isActive          Boolean            @default(true)
+  zone              String?
+  zoomLink          String
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  users             User[]
+  userJudgeMappings UserJudgeMapping[]
+}
+
+model UserJudgeMapping {
+
+  id        String   @id @default(uuid())
+  user      User?    @relation(fields: [userId], references: [id])
+  judge     Judge?   @relation(fields: [judgeId], references: [id])
+  userId    String?  @unique
+  judgeId   String?
+  isActive  Boolean? @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+}
+
+enum AddressType {
+  RESIDENTIAL
+  OFFICE
+}
+
+enum ProcessingStatus {
+  PENDING
+  AUTOREJECTED
+  SELECTED
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum ImageType {
+  CLOSEUP
+  MIDSHOT
+  FULLSIZE
+  NATURALBEAUTY
+}
+
+enum UploadType {
+  IMAGE
+  VIDEO
+}
